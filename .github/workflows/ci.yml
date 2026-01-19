@@ -1,34 +1,86 @@
 name: Standard CI
 
-#trigger 
 on: push
 
 jobs:
-    build-test:
-        name: Build test and deploy  
-        runs-on: ubuntu@latest
+  lint-test:
+    name: Lint
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout latest code
-              uses: actions/checkout@v4 
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4 
-              with:
-                  node-version: 18
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-            - name: Run lint
-              run: npm run lint
+      - name: Install dependencies
+        run: npm install
 
-            - name: Run build
-              run: npm run build
-
-            - name: Run tests
-              run: npm run test
-
-            - name: Run deploy
-              run: npm run deploy
+      - name: Run lint
+        run: npm run lint
 
 
+  build-test:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: lint-test
 
-            
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
+        run: npm run build
+
+
+  test-test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build-test
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run test
+        run: npm run test
+
+
+  deploy-test:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: test-test
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run deploy
+        run: npm run deploy
